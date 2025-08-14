@@ -94,12 +94,37 @@ st.markdown("""
         font-size: 16px !important;
     }
     
-    /* 네 번째 버튼 (전화상담) - 분홍색 */
-    div[data-testid="stVerticalBlock"] > div:nth-child(5) div:nth-child(2) .stButton > button {
-        background: #FED7E2 !important;
-        color: #97266D !important;
-        height: 60px !important;
+    /* 선택 버튼 스타일링 */
+    div[data-testid="stVerticalBlock"] .stButton > button {
+        background: #E8F4FD !important;
+        color: #1E40AF !important;
+        border: 2px solid #60A5FA !important;
+        border-radius: 15px !important;
+        font-size: 18px !important;
+        font-weight: bold !important;
+        padding: 20px !important;
+        margin: 10px 0 !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    div[data-testid="stVerticalBlock"] .stButton > button:hover {
+        background: #DBEAFE !important;
+        border-color: #3B82F6 !important;
+        transform: translateY(-2px) !important;
+    }
+    
+    /* 텍스트 입력 스타일링 */
+    .stTextInput > div > div > input {
+        border-radius: 15px !important;
+        border: 2px solid #E5E7EB !important;
+        padding: 15px 20px !important;
         font-size: 16px !important;
+        text-align: center !important;
+    }
+    
+    .stTextInput > div > div > input:focus {
+        border-color: #3B82F6 !important;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
     }
     
     /* 모바일 최적화 */
@@ -173,24 +198,27 @@ if st.session_state.page == 'main':
             st.session_state.page = 'phone_consultation'
             st.rerun()
 
-# 현재 연금 미수령 중 페이지 - 단계별 질문
+# 현재 연금 미수령 중 페이지 - 단계별 질문 (자동 진행)
 elif st.session_state.page == 'not_receiving':
     # 질문 데이터
     questions = {
         1: {
             "title": "연금 계산기 2",
             "question": "1. 월급 월소득을\n입력해주세요.",
-            "type": "input"
+            "type": "input",
+            "placeholder": "월 소득을 입력하세요 (만원)"
         },
         2: {
             "title": "연금 계산기 3", 
             "question": "2. 국민연금\n가입기간을\n입력해주세요.",
-            "type": "input"
+            "type": "input",
+            "placeholder": "국민연금 가입기간을 입력하세요 (년)"
         },
         3: {
             "title": "연금 계산기 29",
             "question": "1. 나이를\n입력해주세요.",
-            "type": "input"
+            "type": "input",
+            "placeholder": "나이를 입력하세요"
         },
         4: {
             "title": "연금 계산기 22",
@@ -201,28 +229,32 @@ elif st.session_state.page == 'not_receiving':
         5: {
             "title": "연금 계산기 28",
             "question": "3. 가구원 수를\n입력해주세요.",
-            "type": "input"
+            "type": "input",
+            "placeholder": "가구원 수를 입력하세요"
         },
         6: {
             "title": "연금 계산기 23",
-            "question": "5. 파부양자가\n있나요?",
+            "question": "5. 피부양자가\n있나요?",
             "type": "choice",
             "options": ["예", "아니오"]
         },
         7: {
             "title": "연금 계산기 24",
             "question": "6. 현재 보유한\n금융자산을\n입력해주세요.",
-            "type": "input"
+            "type": "input",
+            "placeholder": "현재 보유 금융자산을 입력하세요 (만원)"
         },
         8: {
             "title": "연금 계산기 25",
             "question": "7. 월 수입하는\n연금 급여를\n입력해주세요.",
-            "type": "input"
+            "type": "input",
+            "placeholder": "월 수입하는 연금 급여를 입력하세요 (만원)"
         },
         9: {
             "title": "연금 계산기 26",
             "question": "8. 월 평균\n지출비를\n입력해주세요.",
-            "type": "input"
+            "type": "input",
+            "placeholder": "월 평균 지출비를 입력하세요 (만원)"
         },
         10: {
             "title": "연금 계산기 27",
@@ -246,29 +278,32 @@ elif st.session_state.page == 'not_receiving':
     
     # 질문 표시
     st.markdown(f"""
-    <div style="text-align: center; font-size: 18px; font-weight: bold; margin: 40px 0; line-height: 1.5;">
+    <div style="text-align: center; font-size: 20px; font-weight: bold; margin: 50px 0; line-height: 1.5; color: #333;">
         {current_q['question']}
     </div>
     """, unsafe_allow_html=True)
     
     # 답변 입력/선택
     if current_q['type'] == 'input':
-        if st.session_state.question_step == 1:  # 월급
-            answer = st.text_input("월 소득을 입력하세요 (만원)", key=f"q{st.session_state.question_step}")
-        elif st.session_state.question_step == 2:  # 가입기간
-            answer = st.text_input("국민연금 가입기간을 입력하세요 (년)", key=f"q{st.session_state.question_step}")
-        elif st.session_state.question_step == 3:  # 나이
-            answer = st.text_input("나이를 입력하세요", key=f"q{st.session_state.question_step}")
-        elif st.session_state.question_step == 5:  # 가구원수
-            answer = st.text_input("가구원 수를 입력하세요", key=f"q{st.session_state.question_step}")
-        elif st.session_state.question_step == 7:  # 금융자산
-            answer = st.text_input("현재 보유 금융자산을 입력하세요 (만원)", key=f"q{st.session_state.question_step}")
-        elif st.session_state.question_step == 8:  # 월 연금급여
-            answer = st.text_input("월 수입하는 연금 급여를 입력하세요 (만원)", key=f"q{st.session_state.question_step}")
-        elif st.session_state.question_step == 9:  # 월 지출
-            answer = st.text_input("월 평균 지출비를 입력하세요 (만원)", key=f"q{st.session_state.question_step}")
+        # 입력 필드와 자동 진행
+        answer = st.text_input("", placeholder=current_q['placeholder'], key=f"q{st.session_state.question_step}")
         
-        if st.button("다음", key="next_btn") and answer:
+        # 입력값이 있으면 자동으로 다음 단계로
+        if answer and answer.strip():
+            # 1초 후 자동 진행을 위한 JavaScript
+            st.markdown("""
+            <script>
+            setTimeout(function() {
+                window.parent.document.querySelector('[data-testid="stApp"]').dispatchEvent(new Event('input'));
+            }, 1000);
+            </script>
+            """, unsafe_allow_html=True)
+            
+            # 답변 저장하고 다음 단계로
+            with st.spinner('다음 단계로 이동 중...'):
+                import time
+                time.sleep(1)  # 1초 대기
+                
             st.session_state.answers[st.session_state.question_step] = answer
             if st.session_state.question_step < 10:
                 st.session_state.question_step += 1
@@ -278,11 +313,17 @@ elif st.session_state.page == 'not_receiving':
                 st.rerun()
     
     elif current_q['type'] == 'choice':
-        st.markdown('<div style="margin: 20px 0;"></div>', unsafe_allow_html=True)
+        st.markdown('<div style="margin: 30px 0;"></div>', unsafe_allow_html=True)
         
+        # 선택 버튼들
         for option in current_q['options']:
-            if st.button(option, key=f"choice_{option}"):
+            if st.button(option, key=f"choice_{option}", use_container_width=True):
+                # 선택하면 바로 다음 단계로
                 st.session_state.answers[st.session_state.question_step] = option
+                with st.spinner('다음 단계로 이동 중...'):
+                    import time
+                    time.sleep(0.5)  # 0.5초 대기
+                    
                 if st.session_state.question_step < 10:
                     st.session_state.question_step += 1
                     st.rerun()
@@ -293,22 +334,19 @@ elif st.session_state.page == 'not_receiving':
     # 진행 상황 표시
     progress = st.session_state.question_step / 10
     st.progress(progress)
-    st.markdown(f"<div style='text-align: center; margin-top: 10px;'>{st.session_state.question_step}/10</div>", unsafe_allow_html=True)
+    st.markdown(f"""
+    <div style='text-align: center; margin-top: 15px; font-size: 16px; color: #666;'>
+        {st.session_state.question_step}/10 단계
+    </div>
+    """, unsafe_allow_html=True)
     
-    # 이전/메인으로 버튼
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("← 이전"):
-            if st.session_state.question_step > 1:
-                st.session_state.question_step -= 1
-                st.rerun()
-    
-    with col2:
-        if st.button("메인으로"):
-            st.session_state.page = 'main'
-            st.session_state.question_step = 1
-            st.session_state.answers = {}
-            st.rerun()
+    # 상단에 작은 메인으로 돌아가기 버튼만
+    st.markdown('<div style="margin-top: 30px;"></div>', unsafe_allow_html=True)
+    if st.button("← 메인으로", key="back_to_main"):
+        st.session_state.page = 'main'
+        st.session_state.question_step = 1
+        st.session_state.answers = {}
+        st.rerun()
 
 # 결과 페이지
 elif st.session_state.page == 'result':
