@@ -385,22 +385,188 @@ elif st.session_state.page == 'result':
         st.session_state.answers = {}
         st.rerun()
 
-# 현재 연금 수령 중 페이지
+# 현재 연금 수령 중 페이지 - 단계별 질문 (자동 진행)
 elif st.session_state.page == 'receiving':
-    st.markdown("### 💰 현재 연금 수령 중")
-    st.write("연금 수령 현황을 확인해보세요.")
+    # 연금 수령 중 질문 데이터
+    receiving_questions = {
+        1: {
+            "title": "연금 계산기 20",
+            "question": "1. 나이를\n입력해주세요.",
+            "type": "input",
+            "placeholder": "나이를 입력하세요"
+        },
+        2: {
+            "title": "연금 계산기 13", 
+            "question": "2. 성별을\n선택해주세요.",
+            "type": "choice",
+            "options": ["남성", "여성"]
+        },
+        3: {
+            "title": "연금 계산기 19",
+            "question": "3. 가구원 수를\n입력해주세요.",
+            "type": "input",
+            "placeholder": "가구원 수를 입력하세요"
+        },
+        4: {
+            "title": "연금 계산기 14",
+            "question": "5. 피부양자가\n있나요?",
+            "type": "choice",
+            "options": ["예", "아니오"]
+        },
+        5: {
+            "title": "연금 계산기 15",
+            "question": "6. 현재 보유한\n금융자산을\n입력해주세요.",
+            "type": "input",
+            "placeholder": "현재 보유 금융자산을 입력하세요 (만원)"
+        },
+        6: {
+            "title": "연금 계산기 16",
+            "question": "7. 월 수령하는\n연금 급여를\n입력해주세요.",
+            "type": "input",
+            "placeholder": "월 수령하는 연금 급여를 입력하세요 (만원)"
+        },
+        7: {
+            "title": "연금 계산기 17",
+            "question": "8. 월 평균\n지출비를\n입력해주세요.",
+            "type": "input",
+            "placeholder": "월 평균 지출비를 입력하세요 (만원)"
+        },
+        8: {
+            "title": "연금 계산기 11",
+            "question": "9. 평균 월소득을\n입력해주세요.",
+            "type": "input",
+            "placeholder": "평균 월소득을 입력하세요 (만원)"
+        },
+        9: {
+            "title": "연금 계산기 18",
+            "question": "10. 투자 성향을\n선택해주세요.",
+            "type": "choice",
+            "options": ["안정형", "안정추구형", "위험중립형", "적극투자형"]
+        }
+    }
     
-    current_pension = st.number_input("현재 월 수령액 (만원)", min_value=0, value=100)
-    start_year = st.number_input("수령 시작 연도", min_value=1980, max_value=2024, value=2020)
+    current_q = receiving_questions[st.session_state.question_step]
     
-    if st.button("수령 현황 보기"):
-        years_receiving = 2024 - start_year
-        total_received = current_pension * 12 * years_receiving * 10000
-        st.info(f"수령 기간: {years_receiving}년")
-        st.info(f"총 수령액: {total_received:,.0f}원")
+    # 헤더
+    st.markdown(f"""
+    <div class="main-header">
+        <div class="kb-logo">
+            <span class="kb-star">★</span><span class="kb-text">b KB</span>
+        </div>
+        <div class="title">{current_q['title']}</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # 질문 표시
+    st.markdown(f"""
+    <div style="text-align: center; font-size: 20px; font-weight: bold; margin: 50px 0; line-height: 1.5; color: #333;">
+        {current_q['question']}
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # 답변 입력/선택
+    if current_q['type'] == 'input':
+        # 입력 필드와 자동 진행
+        answer = st.text_input("", placeholder=current_q['placeholder'], key=f"receiving_q{st.session_state.question_step}")
+        
+        # 입력값이 있으면 자동으로 다음 단계로
+        if answer and answer.strip():
+            # 답변 저장하고 다음 단계로
+            with st.spinner('다음 단계로 이동 중...'):
+                import time
+                time.sleep(1)  # 1초 대기
+                
+            st.session_state.answers[st.session_state.question_step] = answer
+            if st.session_state.question_step < 9:
+                st.session_state.question_step += 1
+                st.rerun()
+            else:
+                st.session_state.page = 'receiving_result'
+                st.rerun()
+    
+    elif current_q['type'] == 'choice':
+        st.markdown('<div style="margin: 30px 0;"></div>', unsafe_allow_html=True)
+        
+        # 선택 버튼들
+        for option in current_q['options']:
+            if st.button(option, key=f"receiving_choice_{option}", use_container_width=True):
+                # 선택하면 바로 다음 단계로
+                st.session_state.answers[st.session_state.question_step] = option
+                with st.spinner('다음 단계로 이동 중...'):
+                    import time
+                    time.sleep(0.5)  # 0.5초 대기
+                    
+                if st.session_state.question_step < 9:
+                    st.session_state.question_step += 1
+                    st.rerun()
+                else:
+                    st.session_state.page = 'receiving_result'
+                    st.rerun()
+    
+    # 진행 상황 표시
+    progress = st.session_state.question_step / 9
+    st.progress(progress)
+    st.markdown(f"""
+    <div style='text-align: center; margin-top: 15px; font-size: 16px; color: #666;'>
+        {st.session_state.question_step}/9 단계
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # 상단에 작은 메인으로 돌아가기 버튼만
+    st.markdown('<div style="margin-top: 30px;"></div>', unsafe_allow_html=True)
+    if st.button("← 메인으로", key="receiving_back_to_main"):
+        st.session_state.page = 'main'
+        st.session_state.question_step = 1
+        st.session_state.answers = {}
+        st.rerun()
+
+# 연금 수령 중 결과 페이지
+elif st.session_state.page == 'receiving_result':
+    st.markdown("""
+    <div class="main-header">
+        <div class="kb-logo">
+            <span class="kb-star">★</span><span class="kb-text">b KB</span>
+        </div>
+        <div class="title">연금 수령 현황 분석</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("### 📊 현재 연금 수령 현황")
+    
+    # 입력된 답변 기반 분석
+    if 6 in st.session_state.answers and 7 in st.session_state.answers:
+        try:
+            current_pension = float(st.session_state.answers[6])  # 월 수령 연금
+            monthly_expense = float(st.session_state.answers[7])  # 월 지출
+            surplus = current_pension - monthly_expense
+            
+            st.metric("현재 월 수령 연금", f"{current_pension:,.0f}만원")
+            st.metric("월 평균 지출", f"{monthly_expense:,.0f}만원")
+            
+            if surplus > 0:
+                st.success(f"🎯 월 잉여금: {surplus:,.0f}만원")
+                st.info("💡 현재 연금으로 안정적인 생활이 가능합니다.")
+            else:
+                st.warning(f"⚠️ 월 부족금: {abs(surplus):,.0f}만원")
+                st.info("💡 추가 수입원이나 지출 조정이 필요할 수 있습니다.")
+            
+            # 연간 분석
+            annual_pension = current_pension * 12
+            annual_expense = monthly_expense * 12
+            st.markdown(f"""
+            ### 📈 연간 분석
+            - **연간 수령액**: {annual_pension:,.0f}만원
+            - **연간 지출액**: {annual_expense:,.0f}만원
+            - **연간 수지**: {(annual_pension - annual_expense):,.0f}만원
+            """)
+            
+        except ValueError:
+            st.error("입력값에 오류가 있습니다.")
     
     if st.button("← 메인으로 돌아가기"):
         st.session_state.page = 'main'
+        st.session_state.question_step = 1
+        st.session_state.answers = {}
         st.rerun()
 
 # 상품 정보 페이지
