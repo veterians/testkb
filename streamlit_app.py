@@ -166,7 +166,7 @@ st.markdown("""
 st.markdown("""
 <div class="main-header">
     <div class="kb-logo">
-        <span class="kb-star">★</span><span class="kb-text">b KB</span>
+        <span class="kb-star">★</span><span class="kb-text">KB</span>
         <span class="elderly-emoji">👴👵</span>
     </div>
     <div class="title">시니어 연금 계산기</div>
