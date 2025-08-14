@@ -56,87 +56,50 @@ st.markdown("""
         padding: 20px;
     }
     
-    /* 버튼 스타일 숨기기 */
+    /* Streamlit 버튼 스타일링 */
     .stButton > button {
-        background: transparent !important;
-        border: none !important;
-        padding: 0 !important;
         width: 100% !important;
-        height: auto !important;
+        height: 80px !important;
+        border-radius: 20px !important;
+        font-size: 18px !important;
+        font-weight: bold !important;
+        border: none !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+        transition: all 0.2s ease !important;
+        white-space: pre-line !important;
     }
     
     .stButton > button:hover {
-        background: transparent !important;
-        border: none !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
     }
     
-    .stButton > button:focus {
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
+    /* 첫 번째 버튼 (미수령) - 노란색 */
+    div[data-testid="stVerticalBlock"] > div:nth-child(1) .stButton > button {
+        background: #FFE4B5 !important;
+        color: #8B4513 !important;
     }
     
-    /* 커스텀 버튼 스타일 */
-    .custom-button {
-        width: 100%;
-        padding: 25px 20px;
-        margin: 15px 0;
-        border: none;
-        border-radius: 20px;
-        font-size: 20px;
-        font-weight: bold;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        line-height: 1.3;
+    /* 두 번째 버튼 (수령중) - 파란색 */
+    div[data-testid="stVerticalBlock"] > div:nth-child(3) .stButton > button {
+        background: #B8D4F0 !important;
+        color: #2C5282 !important;
     }
     
-    .yellow-button {
-        background: #FFE4B5;
-        color: #8B4513;
+    /* 세 번째 버튼 (상품정보) - 초록색 */
+    div[data-testid="stVerticalBlock"] > div:nth-child(5) div:nth-child(1) .stButton > button {
+        background: #C6F6D5 !important;
+        color: #22543D !important;
+        height: 60px !important;
+        font-size: 16px !important;
     }
     
-    .blue-button {
-        background: #B8D4F0;
-        color: #2C5282;
-    }
-    
-    .green-button {
-        background: #C6F6D5;
-        color: #22543D;
-        width: 48%;
-        display: inline-block;
-        margin: 10px 1%;
-        font-size: 16px;
-        padding: 20px 10px;
-    }
-    
-    .pink-button {
-        background: #FED7E2;
-        color: #97266D;
-        width: 48%;
-        display: inline-block;
-        margin: 10px 1%;
-        font-size: 16px;
-        padding: 20px 10px;
-    }
-    
-    .custom-button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-    
-    .button-row {
-        display: flex;
-        justify-content: space-between;
-        gap: 10px;
-        margin-top: 20px;
-    }
-    
-    .button-row .custom-button {
-        flex: 1;
-        margin: 0;
+    /* 네 번째 버튼 (전화상담) - 분홍색 */
+    div[data-testid="stVerticalBlock"] > div:nth-child(5) div:nth-child(2) .stButton > button {
+        background: #FED7E2 !important;
+        color: #97266D !important;
+        height: 60px !important;
+        font-size: 16px !important;
     }
     
     /* 모바일 최적화 */
@@ -181,48 +144,32 @@ if 'question_step' not in st.session_state:
 if 'answers' not in st.session_state:
     st.session_state.answers = {}
 
-# 메인 페이지 - HTML 버튼으로 원본과 동일한 디자인
+# 메인 페이지
 if st.session_state.page == 'main':
     # 현재 연금 미수령 중 버튼
-    st.markdown("""
-    <div class="custom-button yellow-button" onclick="document.querySelector('[data-testid=\'stButton\']:nth-of-type(1) button').click()">
-        현재 연금<br>미수령 중
-    </div>
-    """, unsafe_allow_html=True)
-    if st.button("", key="pension_not_receiving"):
+    if st.button("현재 연금\n미수령 중", key="pension_not_receiving", use_container_width=True):
         st.session_state.page = 'not_receiving'
         st.rerun()
     
-    # 현재 연금 수령 중 버튼
-    st.markdown("""
-    <div class="custom-button blue-button" onclick="document.querySelector('[data-testid=\'stButton\']:nth-of-type(2) button').click()">
-        현재 연금<br>수령 중
-    </div>
-    """, unsafe_allow_html=True)
-    if st.button("", key="pension_receiving"):
+    st.markdown('<div style="margin: 15px 0;"></div>', unsafe_allow_html=True)
+    
+    # 현재 연금 수령 중 버튼  
+    if st.button("현재 연금\n수령 중", key="pension_receiving", use_container_width=True):
         st.session_state.page = 'receiving'
         st.rerun()
     
-    # 하단 버튼들
-    st.markdown("""
-    <div class="button-row">
-        <div class="custom-button green-button" onclick="document.querySelector('[data-testid=\'stButton\']:nth-of-type(3) button').click()">
-            상품<br>정보
-        </div>
-        <div class="custom-button pink-button" onclick="document.querySelector('[data-testid=\'stButton\']:nth-of-type(4) button').click()">
-            전화<br>상담
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown('<div style="margin: 20px 0;"></div>', unsafe_allow_html=True)
     
+    # 하단 버튼들
     col1, col2 = st.columns(2)
+    
     with col1:
-        if st.button("", key="product_info"):
+        if st.button("상품\n정보", key="product_info", use_container_width=True):
             st.session_state.page = 'product_info'
             st.rerun()
     
     with col2:
-        if st.button("", key="phone_consultation"):
+        if st.button("전화\n상담", key="phone_consultation", use_container_width=True):
             st.session_state.page = 'phone_consultation'
             st.rerun()
 
